@@ -14,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -27,22 +29,18 @@ jobs:
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
 
+      # ✅ FIXED: Added --token
       - name: Pull Vercel environment info
         run: |
           vercel pull --yes \
-            --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+            --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} \
+            --token=${{ secrets.VERCEL_TOKEN }}
 
+      # ✅ FIXED: Added --token
       - name: Build pre-deployment artifacts
-        run: vercel build
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
+      # ✅ This part was already correct
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
@@ -52,4 +50,3 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           prebuilt: true
           target: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-
