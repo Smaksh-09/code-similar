@@ -40,12 +40,8 @@ jobs:
       - name: Build pre-deployment artifacts
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          prebuilt: true
-          target: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+      - name: Deploy to Vercel (CLI)
+        run: |
+          vercel deploy --prebuilt \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
